@@ -1,0 +1,5 @@
+# requirements.txt
+# Benötigte Libraries (z. B. cryptography)
+tkinter
+cryptography
+sqlite3
