@@ -77,3 +77,4 @@ venv.bak/
 *.sqlite3
 
 data/
+tests/
