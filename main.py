@@ -15,8 +15,8 @@ def main():
     db.initialize_db()
     root = tk.Tk()
     # Center the window on the screen
-    window_width = 700
-    window_height = 400
+    window_width = 900
+    window_height = 600
     screen_width = root.winfo_screenwidth()
     screen_height = root.winfo_screenheight()
     x = int((screen_width / 2) - (window_width / 2))
