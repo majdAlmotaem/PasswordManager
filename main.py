@@ -14,6 +14,14 @@ def main():
     ensure_data_dir()
     db.initialize_db()
     root = tk.Tk()
+    # Center the window on the screen
+    window_width = 700
+    window_height = 400
+    screen_width = root.winfo_screenwidth()
+    screen_height = root.winfo_screenheight()
+    x = int((screen_width / 2) - (window_width / 2))
+    y = int((screen_height / 2) - (window_height / 2))
+    root.geometry(f"{window_width}x{window_height}+{x}+{y}")
     app = MainWindow(root)
     root.mainloop()
 
