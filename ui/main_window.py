@@ -3,7 +3,7 @@
 
 import tkinter as tk
 from core import db, auth, logic
-from tkinter import simpledialog, messagebox, ttk
+from tkinter import ttk
 
 class MainWindow:
     def __init__(self, root):
@@ -29,20 +29,6 @@ class MainWindow:
         self._dark_bg = bg
         self._dark_fg = fg
 
-    def update_widget_colors(self):
-        for widget in self.root.winfo_children():
-            try:
-                if isinstance(widget, tk.Entry):
-                    widget.configure(bg='#232837', fg=self._dark_fg, insertbackground=self.accent, relief=tk.FLAT, font=self.font, highlightthickness=2, highlightbackground=self.accent)
-                elif isinstance(widget, tk.Button):
-                    widget.configure(bg=self.accent, fg='#fff', activebackground='#232837', activeforeground=self.accent, relief=tk.FLAT, borderwidth=0, font=self.font, cursor="hand2")
-                elif isinstance(widget, tk.Frame):
-                    widget.configure(bg=self._dark_bg, highlightbackground='#232837', highlightthickness=2)
-                else:
-                    widget.configure(bg=self._dark_bg, fg=self._dark_fg, font=self.font)
-            except:
-                pass
-
     def show_login(self):
         for widget in self.root.winfo_children():
             widget.destroy()
@@ -64,8 +50,6 @@ class MainWindow:
         register_btn.pack(side=tk.LEFT, padx=10)
         self.login_status = tk.Label(container, text="", font=self.font, bg=self._dark_bg, fg=self._dark_fg)
         self.login_status.pack(pady=(10,0))
-        self.update_widget_colors()
-        # Button hover effects
         for btn in [login_btn, register_btn]:
             btn.bind("<Enter>", lambda e, b=btn: b.config(bg='#232837', fg=self.accent))
             btn.bind("<Leave>", lambda e, b=btn: b.config(bg=self.accent, fg='#fff'))
@@ -100,23 +84,25 @@ class MainWindow:
         topbar = tk.Frame(self.root, bg=self._dark_bg)
         topbar.pack(fill=tk.X, pady=(0,5))
         tk.Label(topbar, text=f"Welcome, {self.username}", font=("Segoe UI", 15, "bold"), bg=self._dark_bg, fg=self.accent).pack(side=tk.LEFT, padx=10, pady=8)
-        logout_btn = tk.Button(topbar, text="Logout", command=self.logout, bg=self.accent, fg='#fff', activebackground='#232837', activeforeground=self.accent, relief=tk.FLAT, borderwidth=0, font=("Segoe UI", 12), cursor="hand2")
-        logout_btn.pack(side=tk.RIGHT, padx=10, pady=8)
-        logout_btn.bind("<Enter>", lambda e: logout_btn.config(bg='#232837', fg=self.accent))
-        logout_btn.bind("<Leave>", lambda e: logout_btn.config(bg=self.accent, fg='#fff'))
+        add_btn = tk.Button(topbar, text="Add New Password", command=self.add_password_dialog, bg=self.accent, fg='#fff', activebackground='#232837', activeforeground=self.accent, relief=tk.FLAT, borderwidth=0, font=("Segoe UI", 12), cursor="hand2")
+        add_btn.pack(side=tk.RIGHT, padx=10, pady=8)
+        add_btn.bind("<Enter>", lambda e: add_btn.config(bg='#232837', fg=self.accent))
+        add_btn.bind("<Leave>", lambda e: add_btn.config(bg=self.accent, fg='#fff'))
         card = tk.Frame(self.root, bg='#232837', bd=0, highlightbackground=self.accent, highlightthickness=2)
         card.pack(fill=tk.BOTH, expand=True, padx=30, pady=10)
         self.tree = ttk.Treeview(card, columns=("Service", "Notes", "Created At"), show='headings', selectmode='browse')
         self.tree.heading("Service", text="Service")
         self.tree.heading("Notes", text="Notes")
         self.tree.heading("Created At", text="Created At")
+        self.tree.column("Service", anchor="center")
+        self.tree.column("Notes", anchor="center")
+        self.tree.column("Created At", anchor="center")
         self.tree.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
         self.load_vault_entries()
-        add_btn = tk.Button(self.root, text="Add New Password", command=self.add_password_dialog, bg=self.accent, fg='#fff', activebackground='#232837', activeforeground=self.accent, relief=tk.FLAT, borderwidth=0, font=("Segoe UI", 12), cursor="hand2")
-        add_btn.pack(pady=5)
-        add_btn.bind("<Enter>", lambda e: add_btn.config(bg='#232837', fg=self.accent))
-        add_btn.bind("<Leave>", lambda e: add_btn.config(bg=self.accent, fg='#fff'))
-        self.update_widget_colors()
+        logout_btn = tk.Button(self.root, text="Logout", command=self.logout, bg=self.accent, fg='#fff', activebackground='#232837', activeforeground=self.accent, relief=tk.FLAT, borderwidth=0, font=("Segoe UI", 12), cursor="hand2")
+        logout_btn.pack(pady=5)
+        logout_btn.bind("<Enter>", lambda e: logout_btn.config(bg='#232837', fg=self.accent))
+        logout_btn.bind("<Leave>", lambda e: logout_btn.config(bg=self.accent, fg='#fff'))
 
     def logout(self):
         self.username = None
@@ -133,8 +119,13 @@ class MainWindow:
     def add_password_dialog(self):
         dialog = tk.Toplevel(self.root)
         dialog.title("Add New Password")
-        dialog.geometry("350x250")
+        dialog.geometry("420x320")
         dialog.configure(bg=self._dark_bg)
+        # Center the dialog over the main window
+        self.root.update_idletasks()
+        x = self.root.winfo_x() + (self.root.winfo_width() // 2) - 210
+        y = self.root.winfo_y() + (self.root.winfo_height() // 2) - 160
+        dialog.geometry(f"420x320+{x}+{y}")
         tk.Label(dialog, text="Service:", font=self.font, bg=self._dark_bg, fg=self._dark_fg).pack(pady=(10,2))
         service_entry = tk.Entry(dialog, font=self.font, bg='#232837', fg=self._dark_fg, insertbackground=self.accent, relief=tk.FLAT, highlightthickness=2, highlightbackground=self.accent)
         service_entry.pack(pady=(0,8))
@@ -164,21 +155,6 @@ class MainWindow:
         save_btn.pack(pady=10)
         save_btn.bind("<Enter>", lambda e: save_btn.config(bg='#232837', fg=self.accent))
         save_btn.bind("<Leave>", lambda e: save_btn.config(bg=self.accent, fg='#fff'))
-
-    def apply_darkmode_to_dialog(self, dialog):
-        bg = self._dark_bg
-        fg = self._dark_fg
-        dialog.configure(bg=bg)
-        for widget in dialog.winfo_children():
-            try:
-                if isinstance(widget, tk.Entry):
-                    widget.configure(bg='#232837', fg=fg, insertbackground=self.accent, relief=tk.FLAT, highlightthickness=2, highlightbackground=self.accent, font=self.font)
-                elif isinstance(widget, tk.Button):
-                    widget.configure(bg=self.accent, fg='#fff', activebackground='#232837', activeforeground=self.accent, relief=tk.FLAT, borderwidth=0, font=self.font, cursor="hand2")
-                else:
-                    widget.configure(bg=bg, fg=fg, font=self.font)
-            except:
-                pass
 
 if __name__ == "__main__":
     root = tk.Tk()
