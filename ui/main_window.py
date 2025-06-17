@@ -4,6 +4,7 @@
 import tkinter as tk
 from core import db, auth, logic
 from tkinter import ttk
+from core.crypto_utils import decrypt
 
 class MainWindow:
     def __init__(self, root):
@@ -63,6 +64,7 @@ class MainWindow:
         if auth.login_user(username, password):
             self.username = username
             self.user_id = db.get_user_id(username)
+            self.master_password = password 
             self.show_vault()
         else:
             self.login_status.config(text="Wrong username or password!", fg="red")
@@ -99,6 +101,7 @@ class MainWindow:
         self.tree.column("Created At", anchor="center")
         self.tree.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
         self.load_vault_entries()
+        self.tree.bind('<Double-1>', self.on_tree_double_click)
         logout_btn = tk.Button(self.root, text="Logout", command=self.logout, bg=self.accent, fg='#fff', activebackground='#232837', activeforeground=self.accent, relief=tk.FLAT, borderwidth=0, font=("Segoe UI", 12), cursor="hand2")
         logout_btn.pack(pady=5)
         logout_btn.bind("<Enter>", lambda e: logout_btn.config(bg='#232837', fg=self.accent))
@@ -110,10 +113,10 @@ class MainWindow:
         self.show_login()
 
     def load_vault_entries(self):
+        self.entries = db.get_entries(self.user_id)
         for row in self.tree.get_children():
             self.tree.delete(row)
-        entries = db.get_entries(self.user_id)
-        for entry in entries:
+        for entry in self.entries:
             self.tree.insert('', tk.END, values=(entry[1], entry[3], entry[4]))
 
     def add_password_dialog(self):
@@ -155,6 +158,42 @@ class MainWindow:
         save_btn.pack(pady=10)
         save_btn.bind("<Enter>", lambda e: save_btn.config(bg='#232837', fg=self.accent))
         save_btn.bind("<Leave>", lambda e: save_btn.config(bg=self.accent, fg='#fff'))
+
+    def on_tree_double_click(self, event):
+        item_id = self.tree.focus()
+        if not item_id:
+            return
+        index = self.tree.index(item_id)
+        entry = self.entries[index]
+        service = entry[1]
+        password = entry[2]
+        notes = entry[3]
+        self.show_password_dialog(service, notes, password)
+
+    def show_password_dialog(self, service, notes, encrypted_password):
+        dialog = tk.Toplevel(self.root)
+        dialog.title(f"{service} Details")
+        dialog.geometry("420x220")
+        dialog.configure(bg=self._dark_bg)
+        self.root.update_idletasks()
+        x = self.root.winfo_x() + (self.root.winfo_width() // 2) - 210
+        y = self.root.winfo_y() + (self.root.winfo_height() // 2) - 110
+        dialog.geometry(f"420x220+{x}+{y}")
+        tk.Label(dialog, text=f"Service: {service}", font=self.font, bg=self._dark_bg, fg=self._dark_fg).pack(pady=(16,4))
+        tk.Label(dialog, text=f"Notes: {notes}", font=self.font, bg=self._dark_bg, fg=self._dark_fg).pack(pady=(0,8))
+        pw_var = tk.StringVar(value="*" * 10)
+        pw_entry = tk.Entry(dialog, textvariable=pw_var, font=self.font, bg='#232837', fg='#00BFFF', relief=tk.FLAT, justify='center', state='normal')
+        pw_entry.pack(pady=(0,8), ipadx=10, ipady=2)
+        def show_pw():
+            try:
+                decrypted = decrypt(encrypted_password, self.master_password)
+                pw_var.set(decrypted)
+            except Exception as e:
+                pw_var.set("Error!")
+        show_btn = tk.Button(dialog, text="Show Password", command=show_pw, bg=self.accent, fg='#fff', activebackground='#232837', activeforeground=self.accent, relief=tk.FLAT, borderwidth=0, font=self.font, cursor="hand2")
+        show_btn.pack(pady=8)
+        show_btn.bind("<Enter>", lambda e: show_btn.config(bg='#232837', fg=self.accent))
+        show_btn.bind("<Leave>", lambda e: show_btn.config(bg=self.accent, fg='#fff'))
 
 if __name__ == "__main__":
     root = tk.Tk()
