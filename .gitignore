@@ -78,3 +78,6 @@ venv.bak/
 
 data/
 tests/
+assets/
+
+livedemo.mov
