@@ -26,10 +26,7 @@ A modern, secure, and user-friendly password manager built with Python and Tkint
 ### Installation
 
 1. Clone the repository:
-   ```sh
-   git clone https://github.com/yourusername/PersonalPasswordManager.git
-   cd PersonalPasswordManager
-   ```
+
 2. Install dependencies:
    ```sh
    pip install -r requirements.txt
@@ -38,27 +35,11 @@ A modern, secure, and user-friendly password manager built with Python and Tkint
 ### Database Setup
 
 - The app will create a SQLite database (`data/vault.db`) on first run.
-- **Schema update:** Ensure your `user` table includes an `email` column:
-  ```sql
-  ALTER TABLE user ADD COLUMN email TEXT;
-  ```
-  (If you are starting fresh, this is handled automatically.)
 
 ### Running the App
 
 ```sh
 python main.py
-```
-
-## Project Structure
-
-```
-core/           # Core logic (auth, db, crypto, registration, etc.)
-data/           # Database file
-ui/             # Tkinter UI code
-main.py         # App entry point
-requirements.txt
-README.md
 ```
 
 ## Security Notes
