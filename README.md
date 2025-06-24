@@ -1,4 +1,4 @@
-# Personal Password Manager
+# Password Manager
 
 <!-- LOGO PLACEHOLDER -->
 <!-- Add your project logo here -->
