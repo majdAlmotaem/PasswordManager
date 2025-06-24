@@ -1,10 +1,16 @@
 # Password Manager
 
 <!-- LOGO PLACEHOLDER -->
-![icon](https://github.com/user-attachments/assets/a8bcccaa-3241-4cc6-9653-1470c7a43a17)
-
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/a8bcccaa-3241-4cc6-9653-1470c7a43a17" alt="icon" width="128"/>
+</p>
 
 A modern, secure, and user-friendly password manager built with Python and Tkinter.
+
+<!-- LIVE DEMO PLACEHOLDER -->
+<p align="center">
+  <b>Live Demo:</b> <!-- Add your live demo link or GIF here -->
+</p>
 
 ## Features
 
@@ -18,7 +24,6 @@ A modern, secure, and user-friendly password manager built with Python and Tkint
 - Logout: Securely log out and return to the login screen.
 
 ![Timeline1-ezgif com-gif-maker (1)](https://github.com/user-attachments/assets/7a7788f3-7275-4800-a2c8-efd7e1070bc2)
-
 
 ## Getting Started
 
