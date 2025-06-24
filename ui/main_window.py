@@ -36,7 +36,7 @@ class MainWindow:
         container = tk.Frame(self.root, bg=self._dark_bg, bd=0, highlightbackground=self.accent, highlightthickness=2)
         container.place(relx=0.5, rely=0.5, anchor='c')
         container.configure(padx=40, pady=30)
-        tk.Label(container, text="Welcome to Personal Password Manager", font=("Segoe UI", 18, "bold"), bg=self._dark_bg, fg=self.accent).pack(pady=(0,16))
+        tk.Label(container, text="Passwords Manager", font=("Segoe UI", 18, "bold"), bg=self._dark_bg, fg=self.accent).pack(pady=(0,16))
         tk.Label(container, text="Username:", font=self.font, bg=self._dark_bg, fg=self._dark_fg).pack(pady=(0,4))
         self.login_username = tk.Entry(container, font=self.font, width=22, bg='#232837', fg=self._dark_fg, insertbackground=self.accent, relief=tk.FLAT, highlightthickness=2, highlightbackground=self.accent)
         self.login_username.pack(pady=(0,10))
@@ -95,6 +95,14 @@ class MainWindow:
             def do_register():
                 from core import register
                 vals = {k: v.get() for k, v in fields.items()}
+                email = vals['email']
+                # Simple email validation
+                if not email:
+                    status_label.config(text="Email is required.", fg="red")
+                    return
+                if '@' not in email or '.' not in email:
+                    status_label.config(text="Invalid email address. Must contain '@' and '.'", fg="red")
+                    return
                 ok, msg = register.register_user(
                     vals['username'], vals['email'],  vals['password'], vals['password2']
                 )
