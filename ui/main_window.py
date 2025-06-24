@@ -122,19 +122,43 @@ class MainWindow:
     def add_password_dialog(self):
         dialog = tk.Toplevel(self.root)
         dialog.title("Add New Password")
-        dialog.geometry("420x320")
+        dialog.geometry("420x500")
         dialog.configure(bg=self._dark_bg)
         # Center the dialog over the main window
         self.root.update_idletasks()
         x = self.root.winfo_x() + (self.root.winfo_width() // 2) - 210
-        y = self.root.winfo_y() + (self.root.winfo_height() // 2) - 160
-        dialog.geometry(f"420x320+{x}+{y}")
+        y = self.root.winfo_y() + (self.root.winfo_height() // 2) - 200
+        dialog.geometry(f"420x500+{x}+{y}")
         tk.Label(dialog, text="Service:", font=self.font, bg=self._dark_bg, fg=self._dark_fg).pack(pady=(10,2))
         service_entry = tk.Entry(dialog, font=self.font, bg='#232837', fg=self._dark_fg, insertbackground=self.accent, relief=tk.FLAT, highlightthickness=2, highlightbackground=self.accent)
         service_entry.pack(pady=(0,8))
         tk.Label(dialog, text="Password:", font=self.font, bg=self._dark_bg, fg=self._dark_fg).pack(pady=(0,2))
         password_entry = tk.Entry(dialog, show='*', font=self.font, bg='#232837', fg=self._dark_fg, insertbackground=self.accent, relief=tk.FLAT, highlightthickness=2, highlightbackground=self.accent)
         password_entry.pack(pady=(0,8))
+        # Password checklist
+        checklist_frame = tk.Frame(dialog, bg=self._dark_bg)
+        checklist_frame.pack(pady=(0,8))
+        checklist_labels = {}
+        checklist_rules = [
+            ("length", "At least 8 characters"),
+            ("uppercase", "Uppercase letter (A-Z)"),
+            ("lowercase", "Lowercase letter (a-z)"),
+            ("digit", "Digit (0-9)"),
+            ("special", "Special character (!@#$...)"),
+        ]
+        for key, text in checklist_rules:
+            lbl = tk.Label(checklist_frame, text=f"\u274C {text}", font=("Segoe UI", 11), bg=self._dark_bg, fg="#d9534f", anchor="w")
+            lbl.pack(anchor="w")
+            checklist_labels[key] = lbl
+        def update_checklist(event=None):
+            rules = logic.validate_password(password_entry.get())
+            for key, text in checklist_rules:
+                if rules[key]:
+                    checklist_labels[key].config(text=f"\u2705 {text}", fg="#5cb85c")
+                else:
+                    checklist_labels[key].config(text=f"\u274C {text}", fg="#d9534f")
+        password_entry.bind('<KeyRelease>', update_checklist)
+        update_checklist()
         tk.Label(dialog, text="Notes:", font=self.font, bg=self._dark_bg, fg=self._dark_fg).pack(pady=(0,2))
         notes_entry = tk.Entry(dialog, font=self.font, bg='#232837', fg=self._dark_fg, insertbackground=self.accent, relief=tk.FLAT, highlightthickness=2, highlightbackground=self.accent)
         notes_entry.pack(pady=(0,8))
@@ -144,11 +168,12 @@ class MainWindow:
             service = service_entry.get()
             password = password_entry.get()
             notes = notes_entry.get()
-            if not logic.validate_password(password):
+            rules = logic.validate_password(password)
+            if not rules['valid']:
                 status_label.config(text="Password is too weak!", fg="red")
                 return
             try:
-                logic.save_password(self.user_id, service, password, notes)
+                logic.save_password(self.user_id, service, password, notes, self.master_password)
                 status_label.config(text="Password saved!", fg="green")
                 self.load_vault_entries()
                 dialog.destroy()
@@ -165,20 +190,21 @@ class MainWindow:
             return
         index = self.tree.index(item_id)
         entry = self.entries[index]
+        entry_id = entry[0]
         service = entry[1]
         password = entry[2]
         notes = entry[3]
-        self.show_password_dialog(service, notes, password)
+        self.show_password_dialog(entry_id, service, notes, password)
 
-    def show_password_dialog(self, service, notes, encrypted_password):
+    def show_password_dialog(self, entry_id, service, notes, encrypted_password):
         dialog = tk.Toplevel(self.root)
         dialog.title(f"{service} Details")
-        dialog.geometry("420x220")
+        dialog.geometry("420x260")
         dialog.configure(bg=self._dark_bg)
         self.root.update_idletasks()
         x = self.root.winfo_x() + (self.root.winfo_width() // 2) - 210
-        y = self.root.winfo_y() + (self.root.winfo_height() // 2) - 110
-        dialog.geometry(f"420x220+{x}+{y}")
+        y = self.root.winfo_y() + (self.root.winfo_height() // 2) - 130
+        dialog.geometry(f"420x260+{x}+{y}")
         tk.Label(dialog, text=f"Service: {service}", font=self.font, bg=self._dark_bg, fg=self._dark_fg).pack(pady=(16,4))
         tk.Label(dialog, text=f"Notes: {notes}", font=self.font, bg=self._dark_bg, fg=self._dark_fg).pack(pady=(0,8))
         pw_var = tk.StringVar(value="*" * 10)
@@ -194,6 +220,15 @@ class MainWindow:
         show_btn.pack(pady=8)
         show_btn.bind("<Enter>", lambda e: show_btn.config(bg='#232837', fg=self.accent))
         show_btn.bind("<Leave>", lambda e: show_btn.config(bg=self.accent, fg='#fff'))
+        def delete_entry_action():
+            from core import db
+            db.delete_entry(entry_id, self.user_id)
+            self.load_vault_entries()
+            dialog.destroy()
+        delete_btn = tk.Button(dialog, text="Delete", command=delete_entry_action, bg="#d9534f", fg='#fff', activebackground='#a94442', activeforeground='#fff', relief=tk.FLAT, borderwidth=0, font=self.font, cursor="hand2")
+        delete_btn.pack(pady=8)
+        delete_btn.bind("<Enter>", lambda e: delete_btn.config(bg='#a94442'))
+        delete_btn.bind("<Leave>", lambda e: delete_btn.config(bg='#d9534f'))
 
 if __name__ == "__main__":
     root = tk.Tk()
