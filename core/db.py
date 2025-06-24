@@ -12,6 +12,7 @@ def initialize_db(db_path='data/vault.db'):
         CREATE TABLE IF NOT EXISTS user (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             username TEXT NOT NULL UNIQUE,
+            email TEXT UNIQUE,
             master_password TEXT NOT NULL
         )
     ''')

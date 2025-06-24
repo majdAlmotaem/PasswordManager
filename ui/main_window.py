@@ -70,15 +70,44 @@ class MainWindow:
             self.login_status.config(text="Wrong username or password!", fg="red")
 
     def handle_register(self):
-        username = self.login_username.get()
-        password = self.login_password.get()
-        if not username or not password:
-            self.login_status.config(text="Please enter username and password", fg="red")
-            return
-        if auth.register_user(username, password):
-            self.login_status.config(text="Registration successful! You can now log in.", fg="green")
-        else:
-            self.login_status.config(text="Username already exists!", fg="red")
+        def open_register_dialog():
+            dialog = tk.Toplevel(self.root)
+            dialog.title("Register New User")
+            dialog.geometry("420x600")
+            dialog.configure(bg=self._dark_bg)
+            self.root.update_idletasks()
+            x = self.root.winfo_x() + (self.root.winfo_width() // 2) - 210
+            y = self.root.winfo_y() + (self.root.winfo_height() // 2) - 240
+            dialog.geometry(f"420x480+{x}+{y}")
+            fields = {}
+            for label, key in [
+                ("Username", "username"),
+                ("Email", "email"),
+                ("Password", "password"),
+                ("confirm Password", "password2")]:
+                tk.Label(dialog, text=label+":", font=self.font, bg=self._dark_bg, fg=self._dark_fg).pack(pady=(10,2))
+                show = '*' if 'password' in key else None
+                entry = tk.Entry(dialog, font=self.font, bg='#232837', fg=self._dark_fg, insertbackground=self.accent, relief=tk.FLAT, highlightthickness=2, highlightbackground=self.accent, show=show)
+                entry.pack(pady=(0,8))
+                fields[key] = entry
+            status_label = tk.Label(dialog, text="", font=self.font, bg=self._dark_bg, fg=self._dark_fg)
+            status_label.pack(pady=(10,0))
+            def do_register():
+                from core import register
+                vals = {k: v.get() for k, v in fields.items()}
+                ok, msg = register.register_user(
+                    vals['username'], vals['email'],  vals['password'], vals['password2']
+                )
+                if ok:
+                    status_label.config(text="Registration successful! You can now log in.", fg="green")
+                    dialog.after(1500, dialog.destroy)
+                else:
+                    status_label.config(text=msg, fg="red")
+            reg_btn = tk.Button(dialog, text="Register", command=do_register, bg=self.accent, fg='#fff', activebackground='#232837', activeforeground=self.accent, relief=tk.FLAT, borderwidth=0, font=self.font, cursor="hand2")
+            reg_btn.pack(pady=16)
+            reg_btn.bind("<Enter>", lambda e: reg_btn.config(bg='#232837', fg=self.accent))
+            reg_btn.bind("<Leave>", lambda e: reg_btn.config(bg=self.accent, fg='#fff'))
+        open_register_dialog()
 
     def show_vault(self):
         for widget in self.root.winfo_children():
