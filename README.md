@@ -9,7 +9,8 @@ A modern, secure, and user-friendly password manager built with Python and Tkint
 
 <!-- LIVE DEMO PLACEHOLDER -->
 <p align="center">
-  <b>Live Demo:</b> <!-- Add your live demo link or GIF here -->
+  <b>Live Demo:</b><br>
+  <img src="https://github.com/user-attachments/assets/7a7788f3-7275-4800-a2c8-efd7e1070bc2" alt="Live Demo GIF" width="600"/>
 </p>
 
 ## Features
