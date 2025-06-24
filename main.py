@@ -14,7 +14,9 @@ def main():
     ensure_data_dir()
     db.initialize_db()
     root = tk.Tk()
-    # Center the window on the screen
+    icon_path = os.path.join('assets', 'app_icon.ico')
+    if os.path.exists(icon_path):
+        root.iconbitmap(icon_path)
     window_width = 900
     window_height = 600
     screen_width = root.winfo_screenwidth()

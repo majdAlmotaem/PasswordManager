@@ -36,7 +36,7 @@ class MainWindow:
         container = tk.Frame(self.root, bg=self._dark_bg, bd=0, highlightbackground=self.accent, highlightthickness=2)
         container.place(relx=0.5, rely=0.5, anchor='c')
         container.configure(padx=40, pady=30)
-        tk.Label(container, text="Passwords Manager", font=("Segoe UI", 18, "bold"), bg=self._dark_bg, fg=self.accent).pack(pady=(0,16))
+        tk.Label(container, text="Password Manager", font=("Segoe UI", 18, "bold"), bg=self._dark_bg, fg=self.accent).pack(pady=(0,16))
         tk.Label(container, text="Username:", font=self.font, bg=self._dark_bg, fg=self._dark_fg).pack(pady=(0,4))
         self.login_username = tk.Entry(container, font=self.font, width=22, bg='#232837', fg=self._dark_fg, insertbackground=self.accent, relief=tk.FLAT, highlightthickness=2, highlightbackground=self.accent)
         self.login_username.pack(pady=(0,10))
